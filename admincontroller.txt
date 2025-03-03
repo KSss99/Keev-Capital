@@ -1,0 +1,55 @@
+<?php
+
+
+namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Session;
+
+use Illuminate\Http\Request;
+
+class AdminController extends Controller
+{
+    public function loginpage(Request $request)
+    {
+      return view('admin.website.login');
+    }
+    
+    public function postLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required',
+            'password' => 'required',
+            
+        ]);
+        $credentials = $request->only('email', 'password');
+        //dd($credentials);
+        if (Auth::attempt($credentials)) 
+        {
+
+          $data=Auth()->user();
+
+          return view('admin.website.dashboard', ['data'=>$data]);
+
+            return redirect()->intended('dashboard')
+                        ->withSuccess('You have Successfully logged in.');
+        }
+  
+        return redirect("/admin")->withSuccess('Oppes! You have entered invalid credentials');
+    }
+    public function logout() {
+      Session::flush();
+      Auth::logout();
+
+      return Redirect('/admin');
+  }
+
+  public function dashboard()
+  {
+    $data=Auth()->user();
+    return view('admin.website.dashboard', ['data'=>$data]);
+  }
+
+}
